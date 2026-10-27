@@ -1,0 +1,42 @@
+[
+  {
+    "name": "1. Action movies released after 2015",
+    "sql": "SELECT DISTINCT m.title, m.release_date FROM movies m JOIN movie_genres mg ON m.movie_id=mg.movie_id JOIN genres g ON g.genre_id=mg.genre_id WHERE g.genre_name='Action' AND CAST(substr(m.release_date,1,4) AS INTEGER)>2015 ORDER BY m.release_date;"
+  },
+  {
+    "name": "2. Top 10 highest-grossing movies and genres",
+    "sql": "SELECT m.title, m.revenue, GROUP_CONCAT(DISTINCT g.genre_name) AS genres FROM movies m LEFT JOIN movie_genres mg ON m.movie_id=mg.movie_id LEFT JOIN genres g ON g.genre_id=mg.genre_id WHERE m.revenue>0 GROUP BY m.movie_id,m.title,m.revenue ORDER BY m.revenue DESC LIMIT 10;"
+  },
+  {
+    "name": "3. Average budget/revenue by genre",
+    "sql": "SELECT g.genre_name, AVG(NULLIF(m.budget,0)) AS avg_budget, AVG(NULLIF(m.revenue,0)) AS avg_revenue FROM genres g JOIN movie_genres mg ON g.genre_id=mg.genre_id JOIN movies m ON m.movie_id=mg.movie_id GROUP BY g.genre_name ORDER BY avg_revenue DESC;"
+  },
+  {
+    "name": "4. Top 10 actors by movie appearances",
+    "sql": "SELECT actor_name, COUNT(DISTINCT movie_id) AS movie_count FROM cast GROUP BY actor_name ORDER BY movie_count DESC, actor_name LIMIT 10;"
+  },
+  {
+    "name": "5. Directors with more than 3 movies",
+    "sql": "SELECT person_name AS director, COUNT(DISTINCT movie_id) AS movie_count FROM crew WHERE LOWER(job)='director' GROUP BY person_id,person_name HAVING COUNT(DISTINCT movie_id)>3 ORDER BY movie_count DESC,director;"
+  },
+  {
+    "name": "6. Top 10 keywords",
+    "sql": "SELECT keyword_name, COUNT(DISTINCT movie_id) AS movie_count FROM movie_keywords GROUP BY keyword_id,keyword_name ORDER BY movie_count DESC,keyword_name LIMIT 10;"
+  },
+  {
+    "name": "7. Budget above average but revenue below average",
+    "sql": "SELECT title,budget,revenue FROM movies WHERE budget>0 AND revenue>0 AND budget>(SELECT AVG(budget) FROM movies WHERE budget>0) AND revenue<(SELECT AVG(revenue) FROM movies WHERE revenue>0) ORDER BY budget DESC;"
+  },
+  {
+    "name": "8. Actors in films directed by Christopher Nolan",
+    "sql": "SELECT DISTINCT c.actor_name FROM cast c JOIN crew cr ON c.movie_id=cr.movie_id WHERE LOWER(cr.job)='director' AND cr.person_name='Christopher Nolan' ORDER BY c.actor_name;"
+  },
+  {
+    "name": "9. Highest-rated genre with at least 20 movies",
+    "sql": "SELECT g.genre_name, AVG(m.vote_average) AS avg_rating, COUNT(DISTINCT m.movie_id) AS movie_count FROM genres g JOIN movie_genres mg ON g.genre_id=mg.genre_id JOIN movies m ON m.movie_id=mg.movie_id GROUP BY g.genre_name HAVING COUNT(DISTINCT m.movie_id)>=20 ORDER BY avg_rating DESC LIMIT 1;"
+  },
+  {
+    "name": "10. Top 10 movies by keyword count",
+    "sql": "SELECT m.title, COUNT(DISTINCT k.keyword_id) AS keyword_count FROM movies m JOIN movie_keywords k ON m.movie_id=k.movie_id GROUP BY m.movie_id,m.title ORDER BY keyword_count DESC,m.title LIMIT 10;"
+  }
+]
